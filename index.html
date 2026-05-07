@@ -11,124 +11,56 @@
 </head>
 <body>
 
-<!-- ─── USER SELECT SCREEN ─────────────────────────────────────────── -->
-<div id="user-screen" class="screen active">
-  <div class="user-screen-inner">
-    <div class="logo-mark">✿</div>
-    <h1 class="site-title">bloom</h1>
-    <p class="site-sub">your quiet corner for growing</p>
-    <div class="user-cards" id="user-cards"></div>
-    <button class="btn-add-user" id="btn-add-user">+ new person</button>
-  </div>
-</div>
-
-<!-- ─── ADD USER MODAL ─────────────────────────────────────────────── -->
-<div id="modal-user" class="modal-overlay hidden">
-  <div class="modal-box">
-    <button class="modal-close" id="close-user-modal">✕</button>
-    <div class="modal-icon">🌱</div>
-    <h2 class="modal-title">who are you?</h2>
-    <input id="new-user-name" class="input-field" type="text" placeholder="your name..." maxlength="24" />
-    <div class="emoji-picker">
-      <p class="emoji-label">pick your avatar</p>
-      <div class="emoji-grid" id="emoji-grid"></div>
-    </div>
-    <button class="btn-primary" id="btn-create-user">bloom →</button>
-  </div>
-</div>
-
-<!-- ─── MAIN APP ───────────────────────────────────────────────────── -->
-<div id="app-screen" class="screen hidden">
-
-  <!-- Sidebar -->
+<div id="app-screen" class="screen active">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <span class="sidebar-logo">✿ bloom</span>
-      <button class="sidebar-toggle" id="sidebar-toggle" title="collapse">‹</button>
+      <button class="sidebar-toggle" id="sidebar-toggle">‹</button>
     </div>
-
-    <div class="user-badge" id="user-badge"></div>
-
     <nav class="sidebar-nav">
-      <button class="nav-item active" data-view="dashboard">
-        <span class="nav-icon">◈</span><span class="nav-label">dashboard</span>
-      </button>
-      <button class="nav-item" data-view="goals">
-        <span class="nav-icon">❋</span><span class="nav-label">my goals</span>
-      </button>
-      <button class="nav-item" data-view="weekly">
-        <span class="nav-icon">◎</span><span class="nav-label">weekly log</span>
-      </button>
-      <button class="nav-item" data-view="compound">
-        <span class="nav-icon">◉</span><span class="nav-label">compound calc</span>
-      </button>
+      <button class="nav-item active" data-view="dashboard"><span class="nav-icon">◈</span><span class="nav-label">dashboard</span></button>
+      <button class="nav-item" data-view="goals"><span class="nav-icon">❋</span><span class="nav-label">my goals</span></button>
+      <button class="nav-item" data-view="weekly"><span class="nav-icon">◎</span><span class="nav-label">weekly log</span></button>
+      <button class="nav-item" data-view="compound"><span class="nav-icon">◉</span><span class="nav-label">compound calc</span></button>
     </nav>
-
-    <div class="sidebar-footer">
-      <button class="btn-switch-user" id="btn-switch-user">⇄ switch</button>
-    </div>
   </aside>
 
-  <!-- Main content -->
-  <main class="main-content" id="main-content">
+  <main class="main-content">
 
-    <!-- ── DASHBOARD ─────────────────────────────────────── -->
     <section id="view-dashboard" class="view active">
       <div class="view-header">
-        <h2 class="view-title">good to see you <span id="dash-name"></span> 🌸</h2>
+        <h2 class="view-title">good to see you 🌸</h2>
         <p class="view-sub">here's where you stand today</p>
       </div>
-
       <div class="kpi-row">
-        <div class="kpi-card">
-          <div class="kpi-num" id="kpi-total">0</div>
-          <div class="kpi-label">total goals</div>
-        </div>
-        <div class="kpi-card accent-green">
-          <div class="kpi-num" id="kpi-done">0</div>
-          <div class="kpi-label">completed</div>
-        </div>
-        <div class="kpi-card accent-amber">
-          <div class="kpi-num" id="kpi-active">0</div>
-          <div class="kpi-label">in progress</div>
-        </div>
-        <div class="kpi-card accent-rose">
-          <div class="kpi-num" id="kpi-avg">—</div>
-          <div class="kpi-label">avg progress</div>
-        </div>
+        <div class="kpi-card"><div class="kpi-num" id="kpi-total">0</div><div class="kpi-label">total goals</div></div>
+        <div class="kpi-card accent-green"><div class="kpi-num" id="kpi-done">0</div><div class="kpi-label">completed</div></div>
+        <div class="kpi-card accent-amber"><div class="kpi-num" id="kpi-active">0</div><div class="kpi-label">in progress</div></div>
+        <div class="kpi-card accent-rose"><div class="kpi-num" id="kpi-avg">—</div><div class="kpi-label">avg progress</div></div>
       </div>
-
       <div class="compound-banner">
         <div class="compound-icon">✦</div>
-        <div class="compound-text">
-          <strong>the compound effect</strong>
-          <span>1% better every day → <em>37× better in a year</em>. Small wins stack silently.</span>
-        </div>
+        <div class="compound-text"><strong>the compound effect</strong><span>1% better every day → <em>37× better in a year</em>. Small wins stack silently.</span></div>
       </div>
-
       <h3 class="section-label">recent goals</h3>
       <div class="goal-list-mini" id="dash-goal-list"></div>
     </section>
 
-    <!-- ── GOALS ─────────────────────────────────────────── -->
     <section id="view-goals" class="view hidden">
       <div class="view-header">
         <h2 class="view-title">my goals ❋</h2>
         <p class="view-sub">track what matters, celebrate every percent</p>
         <button class="btn-primary small" id="btn-add-goal">+ add goal</button>
       </div>
-
       <div class="filter-row">
         <button class="filter-btn active" data-filter="all">all</button>
         <button class="filter-btn" data-filter="In Progress">in progress</button>
         <button class="filter-btn" data-filter="Done">done ✓</button>
         <button class="filter-btn" data-filter="Not Started">not started</button>
       </div>
-
       <div class="goals-grid" id="goals-grid"></div>
     </section>
 
-    <!-- ── WEEKLY LOG ─────────────────────────────────────── -->
     <section id="view-weekly" class="view hidden">
       <div class="view-header">
         <h2 class="view-title">weekly log ◎</h2>
@@ -138,13 +70,11 @@
       <div class="weekly-list" id="weekly-list"></div>
     </section>
 
-    <!-- ── COMPOUND CALC ─────────────────────────────────── -->
     <section id="view-compound" class="view hidden">
       <div class="view-header">
         <h2 class="view-title">compound calculator ◉</h2>
         <p class="view-sub">see what tiny daily gains become over time</p>
       </div>
-
       <div class="calc-layout">
         <div class="calc-inputs">
           <div class="calc-field">
@@ -163,26 +93,15 @@
             <span class="slider-val" id="c-days-val">365</span>
           </div>
           <div class="calc-results">
-            <div class="calc-result-item">
-              <span class="calc-result-label">final level</span>
-              <span class="calc-result-val" id="c-final">—</span>
-            </div>
-            <div class="calc-result-item">
-              <span class="calc-result-label">multiplier</span>
-              <span class="calc-result-val" id="c-mult">—</span>
-            </div>
-            <div class="calc-result-item">
-              <span class="calc-result-label">total gain</span>
-              <span class="calc-result-val" id="c-gain">—</span>
-            </div>
+            <div class="calc-result-item"><span class="calc-result-label">final level</span><span class="calc-result-val" id="c-final">—</span></div>
+            <div class="calc-result-item"><span class="calc-result-label">multiplier</span><span class="calc-result-val" id="c-mult">—</span></div>
+            <div class="calc-result-item"><span class="calc-result-label">total gain</span><span class="calc-result-val" id="c-gain">—</span></div>
           </div>
         </div>
-
         <div class="calc-chart-wrap">
           <canvas id="compound-chart" width="480" height="300"></canvas>
         </div>
       </div>
-
       <div class="ref-table">
         <h3 class="section-label">quick reference · 365 days</h3>
         <div class="ref-rows" id="ref-rows"></div>
@@ -192,76 +111,24 @@
   </main>
 </div>
 
-<!-- ─── GOAL MODAL ─────────────────────────────────────────────────── -->
+<!-- GOAL MODAL -->
 <div id="modal-goal" class="modal-overlay hidden">
   <div class="modal-box wide">
     <button class="modal-close" id="close-goal-modal">✕</button>
     <div class="modal-icon" id="goal-modal-icon">❋</div>
     <h2 class="modal-title" id="goal-modal-title">new goal</h2>
-
     <div class="form-grid">
-      <div class="form-group full">
-        <label class="form-label">goal name</label>
-        <input id="g-name" class="input-field" type="text" placeholder="what do you want to achieve?" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">category</label>
-        <select id="g-cat" class="input-field select-field">
-          <option value="Academic">📚 Academic</option>
-          <option value="Language">🗣️ Language</option>
-          <option value="Research">🔬 Research</option>
-          <option value="Career">💼 Career</option>
-          <option value="Health">🌿 Health</option>
-          <option value="Creative">🎨 Creative</option>
-          <option value="Personal">🌙 Personal</option>
-          <option value="Other">✦ Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">priority</label>
-        <select id="g-priority" class="input-field select-field">
-          <option value="Critical">🔴 Critical</option>
-          <option value="High">🟠 High</option>
-          <option value="Medium" selected>🟡 Medium</option>
-          <option value="Low">🟢 Low</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">start date</label>
-        <input id="g-start" class="input-field" type="date" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">target date</label>
-        <input id="g-target" class="input-field" type="date" />
-      </div>
-      <div class="form-group full">
-        <label class="form-label">progress — <span id="g-progress-val">0</span>%</label>
-        <input id="g-progress" class="slider full-slider" type="range" min="0" max="100" value="0" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">status</label>
-        <select id="g-status" class="input-field select-field">
-          <option value="Not Started">Not Started</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Done">Done ✓</option>
-        </select>
-      </div>
-      <div class="form-group full">
-        <label class="form-label">aspects i'm working on</label>
-        <textarea id="g-aspects" class="input-field textarea" rows="2"
-          placeholder="what specific skills, habits, or sub-tasks are you focusing on?"></textarea>
-      </div>
-      <div class="form-group full">
-        <label class="form-label">latest comment / insight</label>
-        <textarea id="g-comment" class="input-field textarea" rows="2"
-          placeholder="what clicked? what was hard? what did you notice?"></textarea>
-      </div>
-      <div class="form-group full">
-        <label class="form-label">next action</label>
-        <input id="g-next" class="input-field" type="text" placeholder="one concrete next step..." />
-      </div>
+      <div class="form-group full"><label class="form-label">goal name</label><input id="g-name" class="input-field" type="text" placeholder="what do you want to achieve?" /></div>
+      <div class="form-group"><label class="form-label">category</label><select id="g-cat" class="input-field select-field"><option value="Academic">📚 Academic</option><option value="Language">🗣️ Language</option><option value="Research">🔬 Research</option><option value="Career">💼 Career</option><option value="Health">🌿 Health</option><option value="Creative">🎨 Creative</option><option value="Personal">🌙 Personal</option><option value="Other">✦ Other</option></select></div>
+      <div class="form-group"><label class="form-label">priority</label><select id="g-priority" class="input-field select-field"><option value="Critical">🔴 Critical</option><option value="High">🟠 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></div>
+      <div class="form-group"><label class="form-label">start date</label><input id="g-start" class="input-field" type="date" /></div>
+      <div class="form-group"><label class="form-label">target date</label><input id="g-target" class="input-field" type="date" /></div>
+      <div class="form-group full"><label class="form-label">progress — <span id="g-progress-val">0</span>%</label><input id="g-progress" class="slider full-slider" type="range" min="0" max="100" value="0" /></div>
+      <div class="form-group"><label class="form-label">status</label><select id="g-status" class="input-field select-field"><option value="Not Started">Not Started</option><option value="In Progress">In Progress</option><option value="Done">Done ✓</option></select></div>
+      <div class="form-group full"><label class="form-label">aspects i'm working on</label><textarea id="g-aspects" class="input-field textarea" rows="2" placeholder="what specific skills, habits, or sub-tasks are you focusing on?"></textarea></div>
+      <div class="form-group full"><label class="form-label">latest comment / insight</label><textarea id="g-comment" class="input-field textarea" rows="2" placeholder="what clicked? what was hard? what did you notice?"></textarea></div>
+      <div class="form-group full"><label class="form-label">next action</label><input id="g-next" class="input-field" type="text" placeholder="one concrete next step..." /></div>
     </div>
-
     <div class="modal-actions">
       <button class="btn-ghost" id="btn-delete-goal" style="display:none">delete</button>
       <button class="btn-primary" id="btn-save-goal">save goal ✓</button>
@@ -269,42 +136,20 @@
   </div>
 </div>
 
-<!-- ─── WEEKLY ENTRY MODAL ──────────────────────────────────────────── -->
+<!-- WEEKLY MODAL -->
 <div id="modal-weekly" class="modal-overlay hidden">
   <div class="modal-box wide">
     <button class="modal-close" id="close-weekly-modal">✕</button>
     <div class="modal-icon">◎</div>
     <h2 class="modal-title" id="weekly-modal-title">log this week</h2>
-
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">week / date</label>
-        <input id="w-week" class="input-field" type="text" placeholder="e.g. Week 3 · May 19" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">goal</label>
-        <select id="w-goal" class="input-field select-field"></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">progress now (%)</label>
-        <input id="w-now" class="input-field" type="number" min="0" max="100" placeholder="0" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">previous progress (%)</label>
-        <input id="w-prev" class="input-field" type="number" min="0" max="100" placeholder="0" />
-      </div>
-      <div class="form-group full">
-        <label class="form-label">aspects worked on</label>
-        <textarea id="w-aspects" class="input-field textarea" rows="2"
-          placeholder="what specifically did you work on this week?"></textarea>
-      </div>
-      <div class="form-group full">
-        <label class="form-label">reflection / key insight</label>
-        <textarea id="w-reflection" class="input-field textarea" rows="2"
-          placeholder="what clicked? what will you carry forward?"></textarea>
-      </div>
+      <div class="form-group"><label class="form-label">week / date</label><input id="w-week" class="input-field" type="text" placeholder="e.g. Week 3 · May 19" /></div>
+      <div class="form-group"><label class="form-label">goal</label><select id="w-goal" class="input-field select-field"></select></div>
+      <div class="form-group"><label class="form-label">progress now (%)</label><input id="w-now" class="input-field" type="number" min="0" max="100" placeholder="0" /></div>
+      <div class="form-group"><label class="form-label">previous progress (%)</label><input id="w-prev" class="input-field" type="number" min="0" max="100" placeholder="0" /></div>
+      <div class="form-group full"><label class="form-label">aspects worked on</label><textarea id="w-aspects" class="input-field textarea" rows="2" placeholder="what specifically did you work on this week?"></textarea></div>
+      <div class="form-group full"><label class="form-label">reflection / key insight</label><textarea id="w-reflection" class="input-field textarea" rows="2" placeholder="what clicked? what will you carry forward?"></textarea></div>
     </div>
-
     <div class="modal-actions">
       <button class="btn-ghost" id="btn-delete-entry" style="display:none">delete</button>
       <button class="btn-primary" id="btn-save-entry">save entry ✓</button>
@@ -312,9 +157,7 @@
   </div>
 </div>
 
-<!-- ─── TOAST ──────────────────────────────────────────────────────── -->
 <div id="toast" class="toast hidden"></div>
-
 <script src="app.js"></script>
 </body>
 </html>
