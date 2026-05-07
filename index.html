@@ -1,163 +1,825 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bloom · goals tracker</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>bloom · goals tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --white:#fff;--snow:#fafaf9;--petal:#f5f3f0;--mist:#e8e4df;--stone:#c5bfb8;
+  --ink-light:#9a938b;--ink:#3d3833;--ink-deep:#1a1714;
+  --rose:#dba8ac;--rose-light:#fdf0f1;--rose-mid:#f0d0d3;
+  --green:#97b990;--green-light:#edf4ec;--amber:#c9a05e;--amber-light:#fdf3e3;
+  --sidebar-w:210px;--r:14px;--rs:9px;
+  --sh:0 1px 12px rgba(50,40,30,.07);--shm:0 4px 24px rgba(50,40,30,.10);
+  --ff:'Playfair Display',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;--fm:'DM Mono',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px}
+body{font-family:var(--fb);background:var(--snow);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit}
+
+#app{display:flex;min-height:100vh}
+
+.sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--white);border-right:1.5px solid var(--mist);display:flex;flex-direction:column;padding:28px 14px 20px;position:sticky;top:0;height:100vh;flex-shrink:0;transition:width .25s var(--ease),padding .25s var(--ease);overflow:hidden;z-index:20}
+.sidebar.col{width:52px;padding:28px 8px 20px}
+.sb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.logo{font-family:var(--ff);font-size:1.25rem;color:var(--ink-deep);white-space:nowrap;overflow:hidden;transition:opacity .2s}
+.sidebar.col .logo{opacity:0;pointer-events:none}
+.col-btn{width:26px;height:26px;border-radius:50%;background:var(--petal);color:var(--ink-light);font-size:.8rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .25s var(--ease)}
+.col-btn:hover{background:var(--rose-mid)}
+.sidebar.col .col-btn{transform:rotate(180deg)}
+nav{display:flex;flex-direction:column;gap:3px;flex:1}
+.nb{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--rs);color:var(--ink-light);font-size:.87rem;white-space:nowrap;overflow:hidden;transition:background .18s,color .18s}
+.nb:hover{background:var(--petal);color:var(--ink)}
+.nb.on{background:var(--rose-light);color:var(--ink);font-weight:500}
+.sidebar.col .nb{justify-content:center;padding:9px 0}
+.sidebar.col .nl{display:none}
+.ni{font-size:.95rem;flex-shrink:0;min-width:18px;text-align:center}
+
+.main{flex:1;padding:44px 52px;min-width:0}
+
+.view{display:none}
+.view.on{display:block;animation:fu .28s var(--ease)}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.ph{margin-bottom:34px}
+.pt{font-family:var(--ff);font-size:2rem;font-weight:400;color:var(--ink-deep);margin-bottom:4px}
+.ps{font-size:.87rem;color:var(--ink-light);font-style:italic;margin-bottom:14px}
+.sl{font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-bottom:12px}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi{padding:18px 16px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--r);text-align:center;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--shm)}
+.kpi.gr{border-color:var(--green);background:var(--green-light)}
+.kpi.am{border-color:var(--amber);background:var(--amber-light)}
+.kpi.ro{border-color:var(--rose);background:var(--rose-light)}
+.kn{font-family:var(--ff);font-size:2.2rem;font-weight:400;color:var(--ink-deep);line-height:1;margin-bottom:4px}
+.kl{font-size:.76rem;color:var(--ink-light)}
+
+.cb{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--petal);border:1.5px solid var(--mist);border-radius:var(--r);margin-bottom:30px}
+.cb .ico{font-size:1.3rem;flex-shrink:0}
+.cb p{font-size:.87rem;color:var(--ink);line-height:1.55}
+.cb strong{color:var(--ink-deep)}
+.cb em{color:#b5706a;font-style:normal;font-weight:600}
+
+.gml{display:flex;flex-direction:column;gap:8px}
+.gm{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--rs);cursor:pointer;transition:border-color .18s,box-shadow .18s}
+.gm:hover{border-color:var(--rose-mid);box-shadow:var(--sh)}
+.gmn{flex:1;font-size:.9rem;font-weight:500}
+.gmc{font-size:.73rem;color:var(--ink-light);background:var(--petal);padding:2px 9px;border-radius:99px}
+.pw{flex:1;height:5px;background:var(--mist);border-radius:99px;overflow:hidden;max-width:100px}
+.pf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--rose-mid),var(--rose));transition:width .5s var(--ease)}
+.pf.dn{background:linear-gradient(90deg,#87c47f,var(--green))}
+.pf.hi{background:linear-gradient(90deg,#e0c07a,var(--amber))}
+.gmpct{font-family:var(--fm);font-size:.78rem;color:var(--rose);min-width:32px;text-align:right}
+
+.fr{display:flex;gap:7px;margin-bottom:20px;flex-wrap:wrap}
+.fb{padding:5px 14px;border-radius:99px;border:1.5px solid var(--mist);font-size:.79rem;color:var(--ink-light);transition:border-color .18s,background .18s,color .18s}
+.fb:hover{border-color:var(--stone);color:var(--ink)}
+.fb.on{background:var(--ink-deep);border-color:var(--ink-deep);color:#fff}
+
+.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.gc{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--r);padding:20px;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;display:flex;flex-direction:column;gap:10px;box-shadow:var(--sh)}
+.gc:hover{transform:translateY(-3px);box-shadow:var(--shm);border-color:var(--rose-mid)}
+.gct{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.gcn{font-size:.93rem;font-weight:500;color:var(--ink-deep);line-height:1.4}
+.pb{font-size:.68rem;padding:2px 8px;border-radius:99px;font-weight:500;flex-shrink:0}
+.pc{background:#fde8e8;color:#9b3a3a}.ph2{background:#fdf0e0;color:#8a5c20}.pm{background:#fefde0;color:#7a7015}.pl{background:var(--green-light);color:#3a6130}
+.gcat{font-size:.74rem;color:var(--ink-light)}
+.gcp{display:flex;align-items:center;gap:10px}
+.gcpct{font-family:var(--fm);font-size:.76rem;color:var(--ink-light)}
+.sb2{font-size:.7rem;padding:2px 9px;border-radius:99px;font-weight:500;align-self:flex-start}
+.sd{background:var(--green-light);color:#3a6130}.sp{background:var(--amber-light);color:#7a5015}.sn{background:var(--rose-light);color:#8a4040}
+.gca{font-size:.76rem;color:var(--ink-light);line-height:1.5;border-top:1px solid var(--petal);padding-top:8px;font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.wl{display:flex;flex-direction:column;gap:12px}
+.wc{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--r);padding:18px 22px;cursor:pointer;transition:border-color .18s,box-shadow .18s;box-shadow:var(--sh)}
+.wc:hover{border-color:var(--rose-mid);box-shadow:var(--shm)}
+.wct{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.www{font-family:var(--fm);font-size:.76rem;color:var(--ink-light)}
+.wg{font-size:.92rem;font-weight:500;margin-top:2px}
+.gb{font-family:var(--fm);font-size:.82rem;font-weight:500;padding:2px 10px;border-radius:99px}
+.gp{background:var(--green-light);color:#336628}.gz{background:var(--petal);color:var(--ink-light)}.gn2{background:var(--rose-light);color:#8a3535}
+.wa{font-size:.8rem;color:var(--ink-light);margin-bottom:5px}
+.wr{font-size:.84rem;color:var(--ink);line-height:1.55;font-style:italic}
+
+.cw{display:grid;grid-template-columns:300px 1fr;gap:26px;margin-bottom:36px}
+.cf{display:flex;flex-direction:column;gap:18px}
+.cfl label{display:block;font-size:.78rem;color:var(--ink-light);font-weight:500;margin-bottom:8px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:var(--mist);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--rose);border:3px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.15);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.rv{font-family:var(--fm);font-size:.78rem;color:var(--rose);margin-top:5px;display:block}
+.cr{margin-top:6px;padding:16px;background:var(--petal);border-radius:var(--rs);border:1.5px solid var(--mist);display:flex;flex-direction:column;gap:10px}
+.cri{display:flex;justify-content:space-between;align-items:center}
+.crl{font-size:.78rem;color:var(--ink-light)}
+.crv{font-family:var(--ff);font-size:1.15rem;color:var(--ink-deep)}
+.cb2{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--r);padding:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh)}
+.cb2 canvas{max-width:100%}
+.rg{display:flex;flex-direction:column;gap:7px}
+.rr{display:grid;grid-template-columns:1.3fr .8fr 1fr 1.1fr;gap:10px;align-items:center;padding:11px 16px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--rs);font-size:.83rem}
+.rr:nth-child(even){background:var(--snow)}
+.rrl{font-weight:500}
+.rrr{font-family:var(--fm);font-size:.78rem;color:var(--ink-light)}
+.rrm{font-family:var(--fm);color:#b5706a;font-weight:500}
+
+.empty{text-align:center;padding:60px 20px;color:var(--ink-light)}
+.ei{font-size:2.8rem;margin-bottom:10px}
+.et{font-size:.87rem;font-style:italic}
+
+.ov{position:fixed;inset:0;background:rgba(26,23,20,.32);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.ov.hide{display:none}
+.mo{background:var(--white);border-radius:22px;padding:38px;width:100%;max-width:430px;position:relative;box-shadow:var(--shm);max-height:92vh;overflow-y:auto;animation:mi .22s var(--ease)}
+.mo.w{max-width:620px}
+@keyframes mi{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.mc{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;background:var(--petal);color:var(--ink-light);font-size:.75rem;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.mc:hover{background:var(--rose-mid)}
+.mico{font-size:1.8rem;margin-bottom:6px}
+.mt{font-family:var(--ff);font-size:1.55rem;font-weight:400;color:var(--ink-deep);margin-bottom:22px}
+
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px}
+.fi{display:flex;flex-direction:column;gap:5px}
+.fi.f{grid-column:1/-1}
+.fi label{font-size:.76rem;color:var(--ink-light);font-weight:500}
+.fd{width:100%;padding:9px 13px;border:1.5px solid var(--mist);border-radius:var(--rs);background:var(--snow);color:var(--ink);font-size:.87rem;outline:none;transition:border-color .18s,background .18s}
+.fd:focus{border-color:var(--rose);background:var(--white)}
+.fd.ta{resize:vertical;min-height:68px;line-height:1.5}
+select.fd{cursor:pointer;appearance:none}
+.ps2{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;background:var(--mist);outline:none;cursor:pointer;margin-top:5px}
+.ps2::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--rose);border:3px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.mf{display:flex;justify-content:flex-end;align-items:center;gap:10px}
+
+.btn{padding:10px 22px;border-radius:99px;font-size:.86rem;font-weight:500;letter-spacing:.01em;transition:background .18s,transform .15s}
+.btn-p{background:var(--ink-deep);color:#fff}
+.btn-p:hover{background:var(--ink);transform:translateY(-1px)}
+.btn-p.sm{padding:7px 16px;font-size:.8rem}
+.btn-g{border:1.5px solid var(--mist);color:var(--ink-light)}
+.btn-g:hover{color:#b03030;border-color:#e0a0a0}
+
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink-deep);color:#fff;padding:10px 22px;border-radius:99px;font-size:.83rem;z-index:999;white-space:nowrap;animation:ti .22s var(--ease)}
+#toast.hide{display:none}
+@keyframes ti{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+@media(max-width:760px){.main{padding:28px 18px}.kpi-row{grid-template-columns:1fr 1fr}.cw{grid-template-columns:1fr}.gg{grid-template-columns:1fr}.rr{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
-
-<div id="app-screen" class="screen active">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <span class="sidebar-logo">✿ bloom</span>
-      <button class="sidebar-toggle" id="sidebar-toggle">‹</button>
+<div id="app">
+  <aside class="sidebar" id="sb">
+    <div class="sb-top">
+      <span class="logo">✿ bloom</span>
+      <button class="col-btn" id="colBtn">‹</button>
     </div>
-    <nav class="sidebar-nav">
-      <button class="nav-item active" data-view="dashboard"><span class="nav-icon">◈</span><span class="nav-label">dashboard</span></button>
-      <button class="nav-item" data-view="goals"><span class="nav-icon">❋</span><span class="nav-label">my goals</span></button>
-      <button class="nav-item" data-view="weekly"><span class="nav-icon">◎</span><span class="nav-label">weekly log</span></button>
-      <button class="nav-item" data-view="compound"><span class="nav-icon">◉</span><span class="nav-label">compound calc</span></button>
+    <nav>
+      <button class="nb on" data-v="dashboard"><span class="ni">◈</span><span class="nl">dashboard</span></button>
+      <button class="nb" data-v="goals"><span class="ni">❋</span><span class="nl">my goals</span></button>
+      <button class="nb" data-v="weekly"><span class="ni">◎</span><span class="nl">weekly log</span></button>
+      <button class="nb" data-v="compound"><span class="ni">◉</span><span class="nl">compound calc</span></button>
     </nav>
   </aside>
 
-  <main class="main-content">
-
-    <section id="view-dashboard" class="view active">
-      <div class="view-header">
-        <h2 class="view-title">good to see you 🌸</h2>
-        <p class="view-sub">here's where you stand today</p>
+  <main class="main">
+    <section class="view on" id="view-dashboard">
+      <div class="ph">
+        <h1 class="pt">good to see you 🌸</h1>
+        <p class="ps">here's where you stand today</p>
       </div>
       <div class="kpi-row">
-        <div class="kpi-card"><div class="kpi-num" id="kpi-total">0</div><div class="kpi-label">total goals</div></div>
-        <div class="kpi-card accent-green"><div class="kpi-num" id="kpi-done">0</div><div class="kpi-label">completed</div></div>
-        <div class="kpi-card accent-amber"><div class="kpi-num" id="kpi-active">0</div><div class="kpi-label">in progress</div></div>
-        <div class="kpi-card accent-rose"><div class="kpi-num" id="kpi-avg">—</div><div class="kpi-label">avg progress</div></div>
+        <div class="kpi"><div class="kn" id="k-total">0</div><div class="kl">total goals</div></div>
+        <div class="kpi gr"><div class="kn" id="k-done">0</div><div class="kl">completed</div></div>
+        <div class="kpi am"><div class="kn" id="k-active">0</div><div class="kl">in progress</div></div>
+        <div class="kpi ro"><div class="kn" id="k-avg">—</div><div class="kl">avg progress</div></div>
       </div>
-      <div class="compound-banner">
-        <div class="compound-icon">✦</div>
-        <div class="compound-text"><strong>the compound effect</strong><span>1% better every day → <em>37× better in a year</em>. Small wins stack silently.</span></div>
-      </div>
-      <h3 class="section-label">recent goals</h3>
-      <div class="goal-list-mini" id="dash-goal-list"></div>
+      <div class="cb"><div class="ico">✦</div><p><strong>the compound effect</strong> — 1% better every day → <em>37× better in a year</em>. Small wins stack silently.</p></div>
+      <p class="sl">recent goals</p>
+      <div class="gml" id="dash-list"></div>
     </section>
 
-    <section id="view-goals" class="view hidden">
-      <div class="view-header">
-        <h2 class="view-title">my goals ❋</h2>
-        <p class="view-sub">track what matters, celebrate every percent</p>
-        <button class="btn-primary small" id="btn-add-goal">+ add goal</button>
+    <section class="view" id="view-goals">
+      <div class="ph">
+        <h1 class="pt">my goals ❋</h1>
+        <p class="ps">track what matters, celebrate every percent</p>
+        <button class="btn btn-p sm" id="addGoalBtn">+ add goal</button>
       </div>
-      <div class="filter-row">
-        <button class="filter-btn active" data-filter="all">all</button>
-        <button class="filter-btn" data-filter="In Progress">in progress</button>
-        <button class="filter-btn" data-filter="Done">done ✓</button>
-        <button class="filter-btn" data-filter="Not Started">not started</button>
+      <div class="fr">
+        <button class="fb on" data-f="all">all</button>
+        <button class="fb" data-f="In Progress">in progress</button>
+        <button class="fb" data-f="Done">done ✓</button>
+        <button class="fb" data-f="Not Started">not started</button>
       </div>
-      <div class="goals-grid" id="goals-grid"></div>
+      <div class="gg" id="goals-grid"></div>
     </section>
 
-    <section id="view-weekly" class="view hidden">
-      <div class="view-header">
-        <h2 class="view-title">weekly log ◎</h2>
-        <p class="view-sub">your marginal gains, week by week</p>
-        <button class="btn-primary small" id="btn-add-entry">+ log this week</button>
+    <section class="view" id="view-weekly">
+      <div class="ph">
+        <h1 class="pt">weekly log ◎</h1>
+        <p class="ps">your marginal gains, week by week</p>
+        <button class="btn btn-p sm" id="addEntryBtn">+ log this week</button>
       </div>
-      <div class="weekly-list" id="weekly-list"></div>
+      <div class="wl" id="weekly-list"></div>
     </section>
 
-    <section id="view-compound" class="view hidden">
-      <div class="view-header">
-        <h2 class="view-title">compound calculator ◉</h2>
-        <p class="view-sub">see what tiny daily gains become over time</p>
+    <section class="view" id="view-compound">
+      <div class="ph">
+        <h1 class="pt">compound calculator ◉</h1>
+        <p class="ps">see what tiny daily gains become over time</p>
       </div>
-      <div class="calc-layout">
-        <div class="calc-inputs">
-          <div class="calc-field">
-            <label class="calc-label">starting level (%)</label>
-            <input type="range" id="c-start" min="1" max="100" value="10" class="slider" />
-            <span class="slider-val" id="c-start-val">10%</span>
-          </div>
-          <div class="calc-field">
-            <label class="calc-label">daily improvement (%)</label>
-            <input type="range" id="c-rate" min="0.1" max="3" step="0.1" value="1" class="slider" />
-            <span class="slider-val" id="c-rate-val">1.0%</span>
-          </div>
-          <div class="calc-field">
-            <label class="calc-label">days</label>
-            <input type="range" id="c-days" min="7" max="365" value="365" class="slider" />
-            <span class="slider-val" id="c-days-val">365</span>
-          </div>
-          <div class="calc-results">
-            <div class="calc-result-item"><span class="calc-result-label">final level</span><span class="calc-result-val" id="c-final">—</span></div>
-            <div class="calc-result-item"><span class="calc-result-label">multiplier</span><span class="calc-result-val" id="c-mult">—</span></div>
-            <div class="calc-result-item"><span class="calc-result-label">total gain</span><span class="calc-result-val" id="c-gain">—</span></div>
+      <div class="cw">
+        <div class="cf">
+          <div class="cfl"><label>starting level (%)</label><input type="range" id="c-start" min="1" max="100" value="10"/><span class="rv" id="cv-start">10%</span></div>
+          <div class="cfl"><label>daily improvement (%)</label><input type="range" id="c-rate" min="0.1" max="3" step="0.1" value="1"/><span class="rv" id="cv-rate">1.0%</span></div>
+          <div class="cfl"><label>number of days</label><input type="range" id="c-days" min="7" max="365" value="365"/><span class="rv" id="cv-days">365</span></div>
+          <div class="cr">
+            <div class="cri"><span class="crl">final level</span><span class="crv" id="c-final">—</span></div>
+            <div class="cri"><span class="crl">multiplier</span><span class="crv" id="c-mult">—</span></div>
+            <div class="cri"><span class="crl">total gain</span><span class="crv" id="c-gain">—</span></div>
           </div>
         </div>
-        <div class="calc-chart-wrap">
-          <canvas id="compound-chart" width="480" height="300"></canvas>
-        </div>
+        <div class="cb2"><canvas id="chart" width="440" height="280"></canvas></div>
       </div>
-      <div class="ref-table">
-        <h3 class="section-label">quick reference · 365 days</h3>
-        <div class="ref-rows" id="ref-rows"></div>
-      </div>
+      <p class="sl">quick reference · 365 days</p>
+      <div class="rg" id="ref-grid"></div>
     </section>
-
   </main>
 </div>
 
-<!-- GOAL MODAL -->
-<div id="modal-goal" class="modal-overlay hidden">
-  <div class="modal-box wide">
-    <button class="modal-close" id="close-goal-modal">✕</button>
-    <div class="modal-icon" id="goal-modal-icon">❋</div>
-    <h2 class="modal-title" id="goal-modal-title">new goal</h2>
-    <div class="form-grid">
-      <div class="form-group full"><label class="form-label">goal name</label><input id="g-name" class="input-field" type="text" placeholder="what do you want to achieve?" /></div>
-      <div class="form-group"><label class="form-label">category</label><select id="g-cat" class="input-field select-field"><option value="Academic">📚 Academic</option><option value="Language">🗣️ Language</option><option value="Research">🔬 Research</option><option value="Career">💼 Career</option><option value="Health">🌿 Health</option><option value="Creative">🎨 Creative</option><option value="Personal">🌙 Personal</option><option value="Other">✦ Other</option></select></div>
-      <div class="form-group"><label class="form-label">priority</label><select id="g-priority" class="input-field select-field"><option value="Critical">🔴 Critical</option><option value="High">🟠 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></div>
-      <div class="form-group"><label class="form-label">start date</label><input id="g-start" class="input-field" type="date" /></div>
-      <div class="form-group"><label class="form-label">target date</label><input id="g-target" class="input-field" type="date" /></div>
-      <div class="form-group full"><label class="form-label">progress — <span id="g-progress-val">0</span>%</label><input id="g-progress" class="slider full-slider" type="range" min="0" max="100" value="0" /></div>
-      <div class="form-group"><label class="form-label">status</label><select id="g-status" class="input-field select-field"><option value="Not Started">Not Started</option><option value="In Progress">In Progress</option><option value="Done">Done ✓</option></select></div>
-      <div class="form-group full"><label class="form-label">aspects i'm working on</label><textarea id="g-aspects" class="input-field textarea" rows="2" placeholder="what specific skills, habits, or sub-tasks are you focusing on?"></textarea></div>
-      <div class="form-group full"><label class="form-label">latest comment / insight</label><textarea id="g-comment" class="input-field textarea" rows="2" placeholder="what clicked? what was hard? what did you notice?"></textarea></div>
-      <div class="form-group full"><label class="form-label">next action</label><input id="g-next" class="input-field" type="text" placeholder="one concrete next step..." /></div>
+<!-- Goal Modal -->
+<div class="ov hide" id="goal-ov">
+  <div class="mo w">
+    <button class="mc" id="closeGoal">✕</button>
+    <div class="mico" id="g-ico">❋</div>
+    <h2 class="mt" id="g-title">new goal</h2>
+    <div class="fg">
+      <div class="fi f"><label>goal name</label><input class="fd" id="g-name" type="text" placeholder="what do you want to achieve?"/></div>
+      <div class="fi">
+        <label>category</label>
+        <select class="fd" id="g-cat">
+          <option value="Academic">📚 Academic</option><option value="Language">🗣️ Language</option>
+          <option value="Research">🔬 Research</option><option value="Career">💼 Career</option>
+          <option value="Health">🌿 Health</option><option value="Creative">🎨 Creative</option>
+          <option value="Personal">🌙 Personal</option><option value="Other">✦ Other</option>
+        </select>
+      </div>
+      <div class="fi">
+        <label>priority</label>
+        <select class="fd" id="g-priority">
+          <option value="Critical">🔴 Critical</option><option value="High">🟠 High</option>
+          <option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option>
+        </select>
+      </div>
+      <div class="fi"><label>start date</label><input class="fd" id="g-start" type="date"/></div>
+      <div class="fi"><label>target date</label><input class="fd" id="g-target" type="date"/></div>
+      <div class="fi f"><label>progress — <span id="g-pv">0</span>%</label><input class="ps2" id="g-prog" type="range" min="0" max="100" value="0"/></div>
+      <div class="fi">
+        <label>status</label>
+        <select class="fd" id="g-status">
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done ✓</option>
+        </select>
+      </div>
+      <div class="fi f"><label>aspects i'm working on</label><textarea class="fd ta" id="g-aspects" rows="2" placeholder="what specific skills or habits are you focusing on?"></textarea></div>
+      <div class="fi f"><label>latest comment / insight</label><textarea class="fd ta" id="g-comment" rows="2" placeholder="what clicked? what was hard?"></textarea></div>
+      <div class="fi f"><label>next action</label><input class="fd" id="g-next" type="text" placeholder="one concrete next step..."/></div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-ghost" id="btn-delete-goal" style="display:none">delete</button>
-      <button class="btn-primary" id="btn-save-goal">save goal ✓</button>
+    <div class="mf">
+      <button class="btn btn-g" id="deleteGoalBtn" style="display:none">delete</button>
+      <button class="btn btn-p" id="saveGoalBtn">save goal ✓</button>
     </div>
   </div>
 </div>
 
-<!-- WEEKLY MODAL -->
-<div id="modal-weekly" class="modal-overlay hidden">
-  <div class="modal-box wide">
-    <button class="modal-close" id="close-weekly-modal">✕</button>
-    <div class="modal-icon">◎</div>
-    <h2 class="modal-title" id="weekly-modal-title">log this week</h2>
-    <div class="form-grid">
-      <div class="form-group"><label class="form-label">week / date</label><input id="w-week" class="input-field" type="text" placeholder="e.g. Week 3 · May 19" /></div>
-      <div class="form-group"><label class="form-label">goal</label><select id="w-goal" class="input-field select-field"></select></div>
-      <div class="form-group"><label class="form-label">progress now (%)</label><input id="w-now" class="input-field" type="number" min="0" max="100" placeholder="0" /></div>
-      <div class="form-group"><label class="form-label">previous progress (%)</label><input id="w-prev" class="input-field" type="number" min="0" max="100" placeholder="0" /></div>
-      <div class="form-group full"><label class="form-label">aspects worked on</label><textarea id="w-aspects" class="input-field textarea" rows="2" placeholder="what specifically did you work on this week?"></textarea></div>
-      <div class="form-group full"><label class="form-label">reflection / key insight</label><textarea id="w-reflection" class="input-field textarea" rows="2" placeholder="what clicked? what will you carry forward?"></textarea></div>
+<!-- Weekly Modal -->
+<div class="ov hide" id="weekly-ov">
+  <div class="mo w">
+    <button class="mc" id="closeWeekly">✕</button>
+    <div class="mico">◎</div>
+    <h2 class="mt" id="w-title">log this week</h2>
+    <div class="fg">
+      <div class="fi"><label>week / date</label><input class="fd" id="w-week" type="text" placeholder="e.g. Week 3 · May 19"/></div>
+      <div class="fi"><label>goal</label><select class="fd" id="w-goal"></select></div>
+      <div class="fi"><label>progress now (%)</label><input class="fd" id="w-now" type="number" min="0" max="100" placeholder="0"/></div>
+      <div class="fi"><label>previous progress (%)</label><input class="fd" id="w-prev" type="number" min="0" max="100" placeholder="0"/></div>
+      <div class="fi f"><label>aspects worked on</label><textarea class="fd ta" id="w-aspects" rows="2" placeholder="what specifically did you work on?"></textarea></div>
+      <div class="fi f"><label>reflection / key insight</label><textarea class="fd ta" id="w-reflection" rows="2" placeholder="what clicked? what will you carry forward?"></textarea></div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-ghost" id="btn-delete-entry" style="display:none">delete</button>
-      <button class="btn-primary" id="btn-save-entry">save entry ✓</button>
+    <div class="mf">
+      <button class="btn btn-g" id="deleteEntryBtn" style="display:none">delete</button>
+      <button class="btn btn-p" id="saveEntryBtn">save entry ✓</button>
     </div>
   </div>
 </div>
 
-<div id="toast" class="toast hidden"></div>
-<script src="app.js"></script>
+<div id="toast" class="hide"></div>
+
+<script>
+// ── Storage ────────────────────────────────────────────
+var STORE = 'bloom_v3';
+
+function getData() {
+  try {
+    var raw = localStorage.getItem(STORE);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        if (!Array.isArray(parsed.goals))  parsed.goals  = [];
+        if (!Array.isArray(parsed.weekly)) parsed.weekly = [];
+        return parsed;
+      }
+    }
+  } catch(e) { console.warn('bloom: getData error', e); }
+  return { goals: [], weekly: [] };
+}
+
+function saveData(data) {
+  try {
+    localStorage.setItem(STORE, JSON.stringify(data));
+    return true;
+  } catch(e) {
+    console.warn('bloom: saveData error', e);
+    toast('⚠️ could not save — storage may be full');
+    return false;
+  }
+}
+
+// ── State ──────────────────────────────────────────────
+var editGoalId  = null;
+var editEntryId = null;
+var activeFilter = 'all';
+
+// ── Boot ───────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  setupNav();
+  setupSidebar();
+  setupGoalModal();
+  setupWeeklyModal();
+  setupFilters();
+  setupCalcSliders();
+  renderDashboard();
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeAllModals(); });
+});
+
+// ── Navigation ─────────────────────────────────────────
+function setupNav() {
+  var btns = document.querySelectorAll('.nb');
+  for (var i = 0; i < btns.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() { goTo(btn.getAttribute('data-v')); });
+    })(btns[i]);
+  }
+}
+
+function goTo(name) {
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].classList.remove('on');
+  var btns = document.querySelectorAll('.nb');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+
+  var v = document.getElementById('view-' + name);
+  if (v) v.classList.add('on');
+
+  var navBtns = document.querySelectorAll('[data-v="' + name + '"]');
+  for (var i = 0; i < navBtns.length; i++) navBtns[i].classList.add('on');
+
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'goals')     renderGoals();
+  if (name === 'weekly')    renderWeekly();
+  if (name === 'compound')  { renderCompound(); }
+}
+
+// ── Sidebar ────────────────────────────────────────────
+function setupSidebar() {
+  document.getElementById('colBtn').addEventListener('click', function() {
+    document.getElementById('sb').classList.toggle('col');
+  });
+}
+
+// ── Helpers ────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function uid() {
+  return 'g' + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
+}
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+function weekStr() {
+  var d = new Date();
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return 'Week · ' + d.getDate() + ' ' + months[d.getMonth()];
+}
+function progClass(p) { return p >= 100 ? 'dn' : p >= 60 ? 'hi' : ''; }
+function statusClass(s) { return s === 'Done' ? 'sd' : s === 'In Progress' ? 'sp' : 'sn'; }
+function priorityClass(p) {
+  var map = { Critical:'pc', High:'ph2', Medium:'pm', Low:'pl' };
+  return map[p] || 'pm';
+}
+function emptyEl(ico, txt) {
+  var d = document.createElement('div');
+  d.className = 'empty';
+  d.innerHTML = '<div class="ei">' + ico + '</div><div class="et">' + txt + '</div>';
+  return d;
+}
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hide');
+  clearTimeout(t._t);
+  t._t = setTimeout(function() { t.classList.add('hide'); }, 2800);
+}
+
+// ── Dashboard ──────────────────────────────────────────
+function renderDashboard() {
+  var data  = getData();
+  var goals = data.goals;
+  document.getElementById('k-total').textContent  = goals.length;
+  document.getElementById('k-done').textContent   = countByStatus(goals, 'Done');
+  document.getElementById('k-active').textContent = countByStatus(goals, 'In Progress');
+
+  var total = 0;
+  for (var i = 0; i < goals.length; i++) total += (goals[i].progress || 0);
+  document.getElementById('k-avg').textContent = goals.length ? Math.round(total / goals.length) + '%' : '—';
+
+  var list = document.getElementById('dash-list');
+  list.innerHTML = '';
+  if (!goals.length) { list.appendChild(emptyEl('✦','no goals yet — add your first one in "my goals"')); return; }
+
+  var shown = goals.slice(0, 6);
+  for (var i = 0; i < shown.length; i++) {
+    (function(g) {
+      var d = document.createElement('div');
+      d.className = 'gm';
+      d.innerHTML = '<div class="gmn">' + esc(g.name) + '</div>'
+        + '<div class="gmc">' + esc(g.category || '') + '</div>'
+        + '<div class="pw"><div class="pf ' + progClass(g.progress) + '" style="width:' + (g.progress||0) + '%"></div></div>'
+        + '<div class="gmpct">' + (g.progress||0) + '%</div>';
+      d.addEventListener('click', function() { goTo('goals'); openGoalModal(g.id); });
+      list.appendChild(d);
+    })(shown[i]);
+  }
+}
+
+function countByStatus(goals, status) {
+  var n = 0;
+  for (var i = 0; i < goals.length; i++) if (goals[i].status === status) n++;
+  return n;
+}
+
+// ── Goals ──────────────────────────────────────────────
+function renderGoals() {
+  var data  = getData();
+  var goals = data.goals;
+  if (activeFilter !== 'all') {
+    var filtered = [];
+    for (var i = 0; i < goals.length; i++) if (goals[i].status === activeFilter) filtered.push(goals[i]);
+    goals = filtered;
+  }
+  var grid = document.getElementById('goals-grid');
+  grid.innerHTML = '';
+  if (!goals.length) {
+    grid.appendChild(emptyEl('❋', activeFilter === 'all' ? 'no goals yet — click "+ add goal" to begin' : 'no goals with this status'));
+    return;
+  }
+  for (var i = 0; i < goals.length; i++) {
+    (function(g) {
+      var d = document.createElement('div');
+      d.className = 'gc';
+      d.innerHTML = '<div class="gct"><div class="gcn">' + esc(g.name) + '</div>'
+        + '<span class="pb ' + priorityClass(g.priority) + '">' + esc(g.priority||'Medium') + '</span></div>'
+        + '<div class="gcat">' + esc(g.category||'') + '</div>'
+        + '<div class="gcp"><div class="pw" style="max-width:none;flex:1"><div class="pf ' + progClass(g.progress) + '" style="width:' + (g.progress||0) + '%"></div></div>'
+        + '<span class="gcpct">' + (g.progress||0) + '%</span></div>'
+        + '<span class="sb2 ' + statusClass(g.status) + '">' + esc(g.status||'Not Started') + '</span>'
+        + (g.aspects ? '<div class="gca">' + esc(g.aspects) + '</div>' : '');
+      d.addEventListener('click', function() { openGoalModal(g.id); });
+      grid.appendChild(d);
+    })(goals[i]);
+  }
+}
+
+// ── Weekly ─────────────────────────────────────────────
+function renderWeekly() {
+  var data   = getData();
+  var weekly = data.weekly.slice().reverse();
+  var list   = document.getElementById('weekly-list');
+  list.innerHTML = '';
+  if (!weekly.length) { list.appendChild(emptyEl('◎','no entries yet — log your first week!')); return; }
+  for (var i = 0; i < weekly.length; i++) {
+    (function(e) {
+      var gain = (e.now||0) - (e.prev||0);
+      var gcls = gain > 0 ? 'gp' : gain < 0 ? 'gn2' : 'gz';
+      var glbl = gain > 0 ? '+'+gain+'%' : gain < 0 ? gain+'%' : '±0%';
+      var d = document.createElement('div');
+      d.className = 'wc';
+      d.innerHTML = '<div class="wct"><div><div class="www">' + esc(e.week||'') + '</div>'
+        + '<div class="wg">' + esc(e.goal||'') + '</div></div>'
+        + '<span class="gb ' + gcls + '">' + glbl + '</span></div>'
+        + (e.aspects    ? '<div class="wa">worked on: ' + esc(e.aspects) + '</div>' : '')
+        + (e.reflection ? '<div class="wr">"' + esc(e.reflection) + '"</div>' : '');
+      d.addEventListener('click', function() { openWeeklyModal(e.id); });
+      list.appendChild(d);
+    })(weekly[i]);
+  }
+}
+
+// ── Compound calc ──────────────────────────────────────
+function renderCompound() { updateCalc(); buildRefGrid(); }
+
+function setupCalcSliders() {
+  var ids = ['c-start','c-rate','c-days'];
+  for (var i = 0; i < ids.length; i++) {
+    (function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('input', updateCalc);
+    })(ids[i]);
+  }
+}
+
+function updateCalc() {
+  var start = parseFloat(document.getElementById('c-start').value) || 10;
+  var rate  = parseFloat(document.getElementById('c-rate').value)  || 1;
+  var days  = parseInt(document.getElementById('c-days').value)    || 365;
+  document.getElementById('cv-start').textContent = start + '%';
+  document.getElementById('cv-rate').textContent  = rate.toFixed(1) + '%';
+  document.getElementById('cv-days').textContent  = days;
+  var mult  = Math.pow(1 + rate/100, days);
+  var final = start * mult;
+  document.getElementById('c-final').textContent = final.toFixed(1) + '%';
+  document.getElementById('c-mult').textContent  = mult.toFixed(2) + '×';
+  document.getElementById('c-gain').textContent  = '+' + (final - start).toFixed(1) + 'pts';
+  drawChart(start, rate, days);
+}
+
+function drawChart(start, rate, days) {
+  var cv  = document.getElementById('chart');
+  if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var W=cv.width, H=cv.height, pl=46, pr=16, pt=20, pb=32;
+  var cW=W-pl-pr, cH=H-pt-pb;
+  ctx.clearRect(0,0,W,H);
+  var pts=[], step=Math.max(1,Math.floor(days/60));
+  for (var d=0; d<=days; d+=step) pts.push({x:d,y:start*Math.pow(1+rate/100,d)});
+  if (pts[pts.length-1].x !== days) pts.push({x:days,y:start*Math.pow(1+rate/100,days)});
+  var maxY=0; for(var i=0;i<pts.length;i++) if(pts[i].y>maxY) maxY=pts[i].y; maxY*=1.05;
+  function tx(d){return pl+(d/days)*cW;}
+  function ty(v){return pt+cH-(v/maxY)*cH;}
+  ctx.strokeStyle='#e8e4df'; ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){var y=pt+(i/4)*cH; ctx.beginPath(); ctx.moveTo(pl,y); ctx.lineTo(pl+cW,y); ctx.stroke();}
+  var g=ctx.createLinearGradient(0,pt,0,pt+cH);
+  g.addColorStop(0,'rgba(219,168,172,.3)'); g.addColorStop(1,'rgba(219,168,172,0)');
+  ctx.beginPath(); ctx.moveTo(tx(pts[0].x),ty(pts[0].y));
+  for(var i=1;i<pts.length;i++) ctx.lineTo(tx(pts[i].x),ty(pts[i].y));
+  ctx.lineTo(tx(pts[pts.length-1].x),ty(0)); ctx.lineTo(tx(pts[0].x),ty(0));
+  ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(tx(pts[0].x),ty(pts[0].y));
+  for(var i=1;i<pts.length;i++) ctx.lineTo(tx(pts[i].x),ty(pts[i].y));
+  ctx.strokeStyle='#dba8ac'; ctx.lineWidth=2.5; ctx.lineJoin='round'; ctx.stroke();
+  ctx.strokeStyle='#c5bfb8'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pl,pt); ctx.lineTo(pl,pt+cH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pl,pt+cH); ctx.lineTo(pl+cW,pt+cH); ctx.stroke();
+  ctx.fillStyle='#9a938b'; ctx.font='10px DM Mono,monospace'; ctx.textAlign='right';
+  for(var i=0;i<=4;i++) ctx.fillText((maxY*(4-i)/4).toFixed(0),pl-4,pt+(i/4)*cH+4);
+  ctx.textAlign='center';
+  var xLabels=[0,Math.floor(days/2),days];
+  for(var i=0;i<xLabels.length;i++) ctx.fillText(xLabels[i]+'d',tx(xLabels[i]),pt+cH+18);
+}
+
+function buildRefGrid() {
+  var el=document.getElementById('ref-grid'); el.innerHTML='';
+  var sc=[
+    {l:'Decline 1%/day',r:-1,v:'⚠️ Major decay'},
+    {l:'0.1% / day',r:0.1,v:'📊 Slow & steady'},
+    {l:'0.5% / day',r:0.5,v:'📈 Solid growth'},
+    {l:'1% / day',r:1.0,v:'🚀 Elite'},
+    {l:'2% / day',r:2.0,v:'🔥 Extraordinary'},
+  ];
+  for(var i=0;i<sc.length;i++){
+    var m=Math.pow(1+sc[i].r/100,365);
+    var row=document.createElement('div'); row.className='rr';
+    row.innerHTML='<span class="rrl">'+sc[i].l+'</span>'
+      +'<span class="rrr">'+(sc[i].r>0?'+':'')+sc[i].r+'%</span>'
+      +'<span class="rrm">'+m.toFixed(2)+'×</span>'
+      +'<span>'+sc[i].v+'</span>';
+    el.appendChild(row);
+  }
+}
+
+// ── Goal Modal ─────────────────────────────────────────
+function setupGoalModal() {
+  document.getElementById('addGoalBtn').addEventListener('click', function() { openGoalModal(null); });
+  document.getElementById('closeGoal').addEventListener('click', closeAllModals);
+  document.getElementById('saveGoalBtn').addEventListener('click', saveGoal);
+  document.getElementById('deleteGoalBtn').addEventListener('click', deleteGoal);
+  document.getElementById('g-prog').addEventListener('input', function() {
+    document.getElementById('g-pv').textContent = this.value;
+  });
+  document.getElementById('goal-ov').addEventListener('click', function(e) {
+    if (e.target === this) closeAllModals();
+  });
+}
+
+function openGoalModal(id) {
+  editGoalId = id;
+  var data = getData();
+  var g = null;
+  if (id) {
+    for (var i = 0; i < data.goals.length; i++) {
+      if (data.goals[i].id === id) { g = data.goals[i]; break; }
+    }
+  }
+  document.getElementById('g-title').textContent     = g ? 'edit goal' : 'new goal';
+  document.getElementById('g-ico').textContent       = g ? '✏️' : '❋';
+  document.getElementById('g-name').value            = g ? (g.name || '')       : '';
+  document.getElementById('g-cat').value             = g ? (g.category || 'Academic') : 'Academic';
+  document.getElementById('g-priority').value        = g ? (g.priority || 'Medium')   : 'Medium';
+  document.getElementById('g-start').value           = g ? (g.startDate || '')  : todayStr();
+  document.getElementById('g-target').value          = g ? (g.targetDate || '') : '';
+  document.getElementById('g-prog').value            = g ? (g.progress || 0)    : 0;
+  document.getElementById('g-pv').textContent        = g ? (g.progress || 0)    : 0;
+  document.getElementById('g-status').value          = g ? (g.status || 'Not Started') : 'Not Started';
+  document.getElementById('g-aspects').value         = g ? (g.aspects || '')    : '';
+  document.getElementById('g-comment').value         = g ? (g.comment || '')    : '';
+  document.getElementById('g-next').value            = g ? (g.next || '')       : '';
+  document.getElementById('deleteGoalBtn').style.display = g ? 'inline-flex' : 'none';
+  document.getElementById('goal-ov').classList.remove('hide');
+}
+
+function saveGoal() {
+  var name = document.getElementById('g-name').value.trim();
+  if (!name) { toast('please enter a goal name 🌸'); return; }
+
+  var data  = getData();
+  var goals = data.goals;
+  var entry = {
+    name:       name,
+    category:   document.getElementById('g-cat').value,
+    priority:   document.getElementById('g-priority').value,
+    startDate:  document.getElementById('g-start').value,
+    targetDate: document.getElementById('g-target').value,
+    progress:   parseInt(document.getElementById('g-prog').value) || 0,
+    status:     document.getElementById('g-status').value,
+    aspects:    document.getElementById('g-aspects').value.trim(),
+    comment:    document.getElementById('g-comment').value.trim(),
+    next:       document.getElementById('g-next').value.trim()
+  };
+
+  if (editGoalId) {
+    var found = false;
+    for (var i = 0; i < goals.length; i++) {
+      if (goals[i].id === editGoalId) {
+        for (var k in entry) goals[i][k] = entry[k];
+        found = true; break;
+      }
+    }
+    if (!found) { toast('could not find goal to update'); return; }
+  } else {
+    entry.id        = uid();
+    entry.createdAt = Date.now();
+    goals.push(entry);
+  }
+
+  data.goals = goals;
+  var ok = saveData(data);
+  if (ok) {
+    closeAllModals();
+    renderGoals();
+    renderDashboard();
+    toast(editGoalId ? 'goal updated ✓' : 'goal added 🌱');
+  }
+}
+
+function deleteGoal() {
+  if (!editGoalId) return;
+  if (!confirm('delete this goal?')) return;
+  var data = getData();
+  var newGoals = [];
+  for (var i = 0; i < data.goals.length; i++) {
+    if (data.goals[i].id !== editGoalId) newGoals.push(data.goals[i]);
+  }
+  data.goals = newGoals;
+  saveData(data);
+  closeAllModals(); renderGoals(); renderDashboard(); toast('goal deleted');
+}
+
+// ── Weekly Modal ───────────────────────────────────────
+function setupWeeklyModal() {
+  document.getElementById('addEntryBtn').addEventListener('click', function() { openWeeklyModal(null); });
+  document.getElementById('closeWeekly').addEventListener('click', closeAllModals);
+  document.getElementById('saveEntryBtn').addEventListener('click', saveEntry);
+  document.getElementById('deleteEntryBtn').addEventListener('click', deleteEntry);
+  document.getElementById('weekly-ov').addEventListener('click', function(e) {
+    if (e.target === this) closeAllModals();
+  });
+}
+
+function openWeeklyModal(id) {
+  editEntryId = id;
+  var data = getData();
+  var e = null;
+  if (id) {
+    for (var i = 0; i < data.weekly.length; i++) {
+      if (data.weekly[i].id === id) { e = data.weekly[i]; break; }
+    }
+  }
+  var sel = document.getElementById('w-goal');
+  sel.innerHTML = '';
+  for (var i = 0; i < data.goals.length; i++) {
+    var opt = document.createElement('option');
+    opt.value = data.goals[i].name;
+    opt.textContent = data.goals[i].name;
+    sel.appendChild(opt);
+  }
+  document.getElementById('w-title').textContent      = e ? 'edit entry' : 'log this week';
+  document.getElementById('w-week').value             = e ? (e.week || '') : weekStr();
+  sel.value                                           = e ? (e.goal || '') : (data.goals.length ? data.goals[0].name : '');
+  document.getElementById('w-now').value              = e ? (e.now  !== undefined ? e.now  : '') : '';
+  document.getElementById('w-prev').value             = e ? (e.prev !== undefined ? e.prev : '') : '';
+  document.getElementById('w-aspects').value          = e ? (e.aspects    || '') : '';
+  document.getElementById('w-reflection').value       = e ? (e.reflection || '') : '';
+  document.getElementById('deleteEntryBtn').style.display = e ? 'inline-flex' : 'none';
+  document.getElementById('weekly-ov').classList.remove('hide');
+}
+
+function saveEntry() {
+  var week = document.getElementById('w-week').value.trim();
+  var goal = document.getElementById('w-goal').value.trim();
+  if (!week) { toast('please enter a week label 🌸'); return; }
+
+  var data   = getData();
+  var weekly = data.weekly;
+  var entry  = {
+    week:       week,
+    goal:       goal,
+    now:        parseInt(document.getElementById('w-now').value)  || 0,
+    prev:       parseInt(document.getElementById('w-prev').value) || 0,
+    aspects:    document.getElementById('w-aspects').value.trim(),
+    reflection: document.getElementById('w-reflection').value.trim()
+  };
+
+  if (editEntryId) {
+    for (var i = 0; i < weekly.length; i++) {
+      if (weekly[i].id === editEntryId) {
+        for (var k in entry) weekly[i][k] = entry[k];
+        break;
+      }
+    }
+  } else {
+    entry.id = uid();
+    weekly.push(entry);
+  }
+
+  data.weekly = weekly;
+  var ok = saveData(data);
+  if (ok) {
+    closeAllModals();
+    renderWeekly();
+    toast(editEntryId ? 'entry updated ✓' : 'week logged 📊');
+  }
+}
+
+function deleteEntry() {
+  if (!editEntryId) return;
+  if (!confirm('delete this entry?')) return;
+  var data = getData();
+  var newW = [];
+  for (var i = 0; i < data.weekly.length; i++) {
+    if (data.weekly[i].id !== editEntryId) newW.push(data.weekly[i]);
+  }
+  data.weekly = newW;
+  saveData(data);
+  closeAllModals(); renderWeekly(); toast('entry deleted');
+}
+
+// ── Filters ────────────────────────────────────────────
+function setupFilters() {
+  var btns = document.querySelectorAll('.fb');
+  for (var i = 0; i < btns.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var all = document.querySelectorAll('.fb');
+        for (var j = 0; j < all.length; j++) all[j].classList.remove('on');
+        btn.classList.add('on');
+        activeFilter = btn.getAttribute('data-f');
+        renderGoals();
+      });
+    })(btns[i]);
+  }
+}
+
+// ── Close modals ───────────────────────────────────────
+function closeAllModals() {
+  document.getElementById('goal-ov').classList.add('hide');
+  document.getElementById('weekly-ov').classList.add('hide');
+  editGoalId  = null;
+  editEntryId = null;
+}
+</script>
 </body>
 </html>
